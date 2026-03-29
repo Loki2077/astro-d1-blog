@@ -1,0 +1,12 @@
+name = "astro-d1-blog"
+compatibility_date = "2026-03-17"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "my-blog-db"
+database_id = "a33fa6bc-ac01-4f2c-ac48-3f9d16b10a1e"
+
+[[r2_buckets]]
+binding = "BLOG_ASSETS"
+bucket_name = "my-blog-assets"

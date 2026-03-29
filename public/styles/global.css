@@ -1,0 +1,182 @@
+:root {
+  --bg: #0f1115;
+  --bg-soft: #161a22;
+  --panel: #1c2230;
+  --line: #2c3448;
+  --text: #ecf0f8;
+  --text-dim: #96a2bf;
+  --accent: #6ee7b7;
+  --danger: #f87171;
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: radial-gradient(circle at top right, #1e293b 0%, var(--bg) 44%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(12px);
+  background: color-mix(in oklab, var(--bg) 86%, transparent);
+  border-bottom: 1px solid var(--line);
+  padding: 18px clamp(16px, 4vw, 48px);
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  gap: 14px;
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: var(--text-dim);
+  transition: color 160ms ease;
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+.site-main {
+  width: min(1100px, 92vw);
+  margin: 38px auto 64px;
+}
+
+.card {
+  background: linear-gradient(170deg, color-mix(in oklab, var(--panel) 90%, #fff), var(--panel));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(16px, 2.6vw, 24px);
+  box-shadow: 0 20px 60px color-mix(in oklab, var(--bg) 60%, transparent);
+}
+
+.post-list {
+  display: grid;
+  gap: 14px;
+}
+
+.post-item {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  text-decoration: none;
+  background: color-mix(in oklab, var(--bg-soft) 85%, #fff);
+  transition: transform 200ms ease, border-color 200ms ease;
+}
+
+.post-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.post-item h3 {
+  margin: 0 0 8px;
+}
+
+.post-item p {
+  margin: 0;
+  color: var(--text-dim);
+}
+
+.markdown {
+  line-height: 1.72;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  margin-top: 1.6em;
+  margin-bottom: 0.5em;
+}
+
+.markdown p,
+.markdown ul,
+.markdown ol {
+  color: #d3dcf2;
+}
+
+.markdown pre {
+  background: #0b0f16;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  overflow-x: auto;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: #0d121d;
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+button {
+  border: 1px solid transparent;
+  background: var(--accent);
+  color: #042013;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button-danger {
+  background: var(--danger);
+  color: #2b0909;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--text-dim);
+}
