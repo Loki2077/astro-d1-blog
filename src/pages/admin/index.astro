@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { safeParseObject } from '../../lib/config';
+import { getDb, getSiteConfig, listAllPosts } from '../../lib/db';
+
+const db = getDb(Astro);
+const [posts, baseConfigRecord] = await Promise.all([listAllPosts(db), getSiteConfig(db, 'base')]);
+const baseConfigText = baseConfigRecord?.value ?? '{"siteTitle":"Astro D1 Blog"}';
+const baseConfig = safeParseObject(baseConfigText);
+const navLinks = Array.isArray(baseConfig.navLinks)
+  ? (baseConfig.navLinks as Array<{ name: string; url: string }>)
+  : [];
+---
+
+<BaseLayout
+  title="后台管理"
+  siteTitle={String(baseConfig.siteTitle ?? 'Astro D1 Blog')}
+  theme={String(baseConfig.theme ?? 'ink')}
+  navLinks={navLinks}
+>
+  <section class="card" style="margin-bottom: 18px;">
+    <h2>全局配置（site_configs.base）</h2>
+    <form class="form-grid" method="POST" action="/api/admin/site-config/update">
+      <label>
+        JSON 配置
+        <textarea name="value">{baseConfigText}</textarea>
+      </label>
+      <button type="submit">保存全局配置</button>
+    </form>
+  </section>
+
+  <section class="card" style="margin-bottom: 18px;">
+    <h2>新建文章</h2>
+    <form class="form-grid" method="POST" action="/api/admin/posts/create">
+      <label>Slug <input required name="slug" placeholder="my-first-post" /></label>
+      <label>标题 <input required name="title" placeholder="第一篇文章" /></label>
+      <label>摘要 <textarea name="summary" /></label>
+      <label>封面图 URL <input name="cover_url" placeholder="https://..." /></label>
+      <label>标签（逗号分隔） <input name="tags" placeholder="astro,d1,cloudflare" /></label>
+      <label>
+        状态
+        <select name="status">
+          <option value="pub">发布</option>
+          <option value="draft">草稿</option>
+        </select>
+      </label>
+      <label>page_config（JSON） <textarea name="page_config">{'{}'}</textarea></label>
+      <label>Markdown 正文 <textarea required name="content" placeholder="# 标题" /></label>
+      <button type="submit">创建文章</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>文章管理</h2>
+    <div class="post-list">
+      {posts.map((post) => (
+        <article class="post-item">
+          <h3>{post.title}</h3>
+          <p>{post.summary ?? '暂无摘要'}</p>
+          <p class="meta"><span>{post.slug}</span> · <span>{post.status}</span> · <span>{post.updated_at}</span></p>
+          <div class="row" style="margin-top: 10px;">
+            <a href={'/admin/edit/' + post.id}>编辑</a>
+            <a href={'/blog/' + post.slug}>预览</a>
+            <form method="POST" action="/api/admin/posts/delete">
+              <input type="hidden" name="id" value={post.id} />
+              <button class="button-danger" type="submit">删除</button>
+            </form>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

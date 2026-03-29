@@ -1,0 +1,42 @@
+---
+import matter from 'gray-matter';
+import { marked } from 'marked';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buildFinalConfig, safeParseObject } from '../../lib/config';
+import { getDb, getPostBySlug, getSiteConfig } from '../../lib/db';
+
+const slug = Astro.params.slug ?? '';
+const db = getDb(Astro);
+const [post, baseConfigRecord] = await Promise.all([
+  getPostBySlug(db, slug),
+  getSiteConfig(db, 'base'),
+]);
+
+if (!post || post.status !== 'pub') {
+  return Astro.redirect('/');
+}
+
+const globalConfig = safeParseObject(baseConfigRecord?.value);
+const dbPageConfig = safeParseObject(post.page_config);
+const parsed = matter(post.content);
+const frontmatterConfig =
+  parsed.data && typeof parsed.data === 'object' ? (parsed.data as Record<string, unknown>) : {};
+const finalConfig = buildFinalConfig(globalConfig, dbPageConfig, frontmatterConfig);
+const markdownHtml = await marked.parse(parsed.content);
+const navLinks = Array.isArray(finalConfig.navLinks)
+  ? (finalConfig.navLinks as Array<{ name: string; url: string }>)
+  : [];
+---
+
+<BaseLayout
+  title={post.title}
+  siteTitle={String(finalConfig.siteTitle ?? 'Astro D1 Blog')}
+  theme={String(finalConfig.theme ?? 'ink')}
+  navLinks={navLinks}
+>
+  <article class="card">
+    <h1>{post.title}</h1>
+    <p class="meta">更新时间：{post.updated_at}</p>
+    <div class="markdown" set:html={markdownHtml} />
+  </article>
+</BaseLayout>

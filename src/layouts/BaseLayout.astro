@@ -1,0 +1,36 @@
+---
+interface Props {
+  title: string;
+  siteTitle?: string;
+  theme?: string;
+  navLinks?: Array<{ name: string; url: string }>;
+}
+
+const { title, siteTitle = 'Astro D1 Blog', theme = 'ink', navLinks = [] } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN" data-theme={theme}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title} · {siteTitle}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="/styles/global.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="/" class="brand">{siteTitle}</a>
+      <nav class="site-nav">
+        {navLinks.map((link) => (
+          <a href={link.url}>{link.name}</a>
+        ))}
+      </nav>
+    </header>
+    <main class="site-main">
+      <slot />
+    </main>
+  </body>
+</html>

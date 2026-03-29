@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { safeParseObject } from '../lib/config';
+import { getDb, getSiteConfig, listPublishedPosts } from '../lib/db';
+
+const db = getDb(Astro);
+const [posts, baseConfigRecord] = await Promise.all([
+  listPublishedPosts(db),
+  getSiteConfig(db, 'base'),
+]);
+const baseConfig = safeParseObject(baseConfigRecord?.value);
+const navLinks = Array.isArray(baseConfig.navLinks)
+  ? (baseConfig.navLinks as Array<{ name: string; url: string }>)
+  : [];
+
+---
+<BaseLayout
+  title="文章列表"
+  siteTitle={String(baseConfig.siteTitle ?? 'Astro D1 Blog')}
+  theme={String(baseConfig.theme ?? 'ink')}
+  navLinks={navLinks}
+>
+  <section class="card">
+    <h1>文章列表</h1>
+    <p class="meta">共 {posts.length} 篇已发布文章</p>
+    <div class="post-list" style="margin-top: 18px;">
+      {posts.map((post) => (
+        <a class="post-item" href={`/blog/${post.slug}`}>
+          <h3>{post.title}</h3>
+          <p>{post.summary ?? '暂无摘要'}</p>
+          <p class="meta" style="margin-top: 8px;">更新时间：{post.updated_at}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { safeParseObject } from '../../../lib/config';
+import { getDb, getPostById, getSiteConfig } from '../../../lib/db';
+
+const id = Number(Astro.params.id ?? 0);
+const db = getDb(Astro);
+const [post, baseConfigRecord] = await Promise.all([getPostById(db, id), getSiteConfig(db, 'base')]);
+
+if (!post) {
+  return Astro.redirect('/admin');
+}
+
+const baseConfig = safeParseObject(baseConfigRecord?.value);
+const navLinks = Array.isArray(baseConfig.navLinks)
+  ? (baseConfig.navLinks as Array<{ name: string; url: string }>)
+  : [];
+---
+
+<BaseLayout
+  title={`编辑：${post.title}`}
+  siteTitle={String(baseConfig.siteTitle ?? 'Astro D1 Blog')}
+  theme={String(baseConfig.theme ?? 'ink')}
+  navLinks={navLinks}
+>
+  <section class="card">
+    <h1>编辑文章</h1>
+    <form class="form-grid" method="POST" action="/api/admin/posts/update">
+      <input type="hidden" name="id" value={post.id} />
+      <label>Slug <input required name="slug" value={post.slug} /></label>
+      <label>标题 <input required name="title" value={post.title} /></label>
+      <label>摘要 <textarea name="summary">{post.summary ?? ''}</textarea></label>
+      <label>封面图 URL <input name="cover_url" value={post.cover_url ?? ''} /></label>
+      <label>标签（逗号分隔） <input name="tags" value={post.tags ?? ''} /></label>
+      <label>
+        状态
+        <select name="status">
+          <option value="pub" selected={post.status === 'pub'}>发布</option>
+          <option value="draft" selected={post.status === 'draft'}>草稿</option>
+        </select>
+      </label>
+      <label>page_config（JSON） <textarea name="page_config">{post.page_config}</textarea></label>
+      <label>Markdown 正文 <textarea required name="content">{post.content}</textarea></label>
+      <div class="row">
+        <button type="submit">保存修改</button>
+        <a href="/admin">返回管理页</a>
+      </div>
+    </form>
+  </section>
+</BaseLayout>
